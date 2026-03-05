@@ -1,6 +1,5 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { parse } from 'node:path';
 
 export interface Post {
     slug: string;
@@ -31,7 +30,7 @@ export async function getAllPosts(): Promise<Post[]> {
             const content = fileContent.replace(/^---\r?\n[\s\S]+?\r?\n---/, '').trim();
 
             const frontmatter: any = {};
-            if (frontmatterMatch) {
+            if (frontmatterMatch && frontmatterMatch[1]) {
                 frontmatterMatch[1].split('\n').forEach(line => {
                     const [key, ...valueParts] = line.split(':');
                     if (key && valueParts.length) {
@@ -79,7 +78,7 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
         const content = fileContent.replace(/^---\r?\n[\s\S]+?\r?\n---/, '').trim();
 
         const frontmatter: any = {};
-        if (frontmatterMatch) {
+        if (frontmatterMatch && frontmatterMatch[1]) {
             frontmatterMatch[1].split('\n').forEach(line => {
                 const [key, ...valueParts] = line.split(':');
                 if (key && valueParts.length) {

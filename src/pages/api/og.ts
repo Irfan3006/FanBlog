@@ -2,7 +2,6 @@ import type { APIRoute } from 'astro';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 import fs from 'node:fs/promises';
-import path from 'node:path';
 
 export const GET: APIRoute = async ({ url }) => {
     const title = url.searchParams.get('title') || 'FanBlog';

@@ -5,7 +5,7 @@ import slugify from 'slugify';
 
 const POSTS_PATH = path.join(process.cwd(), 'content', 'posts');
 
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async () => {
     return new Response(JSON.stringify({ message: "Use the posts utility instead" }), { status: 400 });
 };
 
