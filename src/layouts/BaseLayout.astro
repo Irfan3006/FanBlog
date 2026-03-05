@@ -23,6 +23,19 @@ const socialImage = ogImage ? new URL(ogImage, Astro.url) : defaultOgImage;
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 
+		<meta name="google-site-verification" content="29CnmVlPwO8uPHulbQR6KYzol5wqfKfgDzUtH2isZPk" />
+		<!-- Google tag (gtag.js) -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-7BZ139PHRS"></script>
+		<script is:inline>
+			window.dataLayer = window.dataLayer || [];
+			function gtag() {
+				dataLayer.push(arguments);
+			}
+			gtag("js", new Date());
+
+			gtag("config", "G-7BZ139PHRS");
+		</script>
+
 		<title>{title} | FanBlog</title>
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonicalURL} />
