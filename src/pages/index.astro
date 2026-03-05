@@ -1,0 +1,71 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getAllPosts } from "../lib/posts";
+import BlogCard from "../components/BlogCard.astro";
+
+const posts = await getAllPosts();
+---
+
+<BaseLayout
+    title="Home"
+    description="FanBlog is a modern blog platform built with Astro SSR. Read our latest thoughts on web development, technology, and more."
+>
+    <section class="hero container">
+        <h1>Welcome to <span class="text-orange">FanBlog</span></h1>
+        <p class="subtitle">A modern, fast, and minimal blog built with Astro SSR.</p>
+    </section>
+
+    <section class="container blog-list">
+        <h2>Latest Articles</h2>
+        <div class="posts-grid">
+            {posts.length > 0 ? posts.map((post) => <BlogCard post={post} />) : <p>No posts found. Start by creating one in the admin panel!</p>}
+        </div>
+    </section>
+</BaseLayout>
+
+<style>
+    .hero {
+        padding: 4rem 1.5rem;
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin-bottom: 1rem;
+    }
+
+    .text-orange {
+        color: var(--color-primary);
+    }
+
+    .subtitle {
+        font-size: 1.25rem;
+        color: var(--text-color);
+        max-width: 600px;
+        margin: 0 auto;
+        opacity: 0.8;
+    }
+
+    .blog-list {
+        padding-bottom: 4rem;
+    }
+
+    h2 {
+        margin-bottom: 2rem;
+        font-size: 2rem;
+    }
+
+    .posts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    @media (max-width: 600px) {
+        h1 {
+            font-size: 2.5rem;
+        }
+    }
+</style>

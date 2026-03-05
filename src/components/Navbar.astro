@@ -1,0 +1,85 @@
+---
+import ThemeToggle from "./ThemeToggle.astro";
+---
+
+<header class="navbar">
+    <div class="container nav-content">
+        <a href="/" class="logo">
+            <span class="logo-fan">Fan</span><span class="logo-blog">Blog</span>
+        </a>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/blog">Blog</a></li>
+                <li><a href="/admin" class="admin-link">Admin</a></li>
+                <li><ThemeToggle /></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<style>
+    .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background-color: var(--nav-bg);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border-color);
+        padding: 1rem 0;
+    }
+
+    .nav-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+
+    .logo-fan {
+        color: var(--color-primary);
+    }
+    .logo-blog {
+        color: var(--text-color);
+    }
+
+    .nav-links {
+        display: flex;
+        align-items: center;
+        list-style: none;
+        gap: 2rem;
+    }
+
+    .nav-links a {
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+        color: var(--color-primary);
+    }
+
+    .admin-link {
+        background-color: var(--color-black);
+        color: var(--color-white) !important;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+    }
+
+    :global([data-theme="dark"]) .admin-link {
+        background-color: var(--color-white);
+        color: var(--color-black) !important;
+    }
+
+    @media (max-width: 600px) {
+        .nav-links {
+            gap: 1rem;
+        }
+    }
+</style>

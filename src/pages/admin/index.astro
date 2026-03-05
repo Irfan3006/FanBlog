@@ -1,0 +1,133 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getAllPosts } from "../../lib/posts";
+
+const posts = await getAllPosts();
+---
+
+<BaseLayout title="Admin Dashboard">
+    <div class="admin-container container">
+        <header class="admin-header">
+            <h1>Admin Dashboard</h1>
+            <a href="/admin/editor" class="btn btn-primary">+ New Post</a>
+        </header>
+
+        <div class="post-manager">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Date</th>
+                        <th>Author</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {
+                        posts.map((post) => (
+                            <tr data-slug={post.slug}>
+                                <td>{post.title}</td>
+                                <td>{new Date(post.date).toLocaleDateString()}</td>
+                                <td>{post.author}</td>
+                                <td class="actions">
+                                    <a href={`/admin/editor?slug=${post.slug}`} class="btn-edit">
+                                        Edit
+                                    </a>
+                                    <button class="btn-delete" data-slug={post.slug}>
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        ))
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</BaseLayout>
+
+<style>
+    .admin-container {
+        padding: 4rem 1.5rem;
+    }
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .post-manager {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+    th,
+    td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    th {
+        font-weight: 700;
+        color: var(--color-primary);
+    }
+
+    .actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-edit {
+        color: var(--color-primary);
+        font-weight: 600;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        border: 1px solid var(--color-primary);
+    }
+    .btn-delete {
+        color: #ff4d4d;
+        background: transparent;
+        border: 1px solid #ff4d4d;
+        font-weight: 600;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .btn-edit:hover {
+        background-color: var(--color-primary);
+        color: white;
+    }
+    .btn-delete:hover {
+        background-color: #ff4d4d;
+        color: white;
+    }
+</style>
+
+<script>
+    document.querySelectorAll(".btn-delete").forEach((btn) => {
+        btn.addEventListener("click", async (e) => {
+            const slug = (e.target as HTMLElement).getAttribute("data-slug");
+            if (confirm(`Are you sure you want to delete "${slug}"?`)) {
+                const res = await fetch("/api/posts", {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ slug }),
+                });
+
+                if (res.ok) {
+                    window.location.reload();
+                } else {
+                    alert("Failed to delete post");
+                }
+            }
+        });
+    });
+</script>

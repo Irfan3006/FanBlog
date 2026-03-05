@@ -1,0 +1,177 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getAllPosts } from "../../lib/posts";
+import BlogCard from "../../components/BlogCard.astro";
+
+const posts = await getAllPosts();
+const tags = [...new Set(posts.flatMap((post) => post.tags))].sort();
+
+const { searchParams } = Astro.url;
+const currentTag = searchParams.get("tag");
+
+const filteredPosts = currentTag ? posts.filter((post) => post.tags.includes(currentTag)) : posts;
+---
+
+<BaseLayout
+    title="All Posts"
+    description="Browse all articles on FanBlog. Explore categories, search for topics, and stay updated with our latest content."
+>
+    <div class="container blog-archive">
+        <header class="archive-header">
+            <h1>All Articles</h1>
+            <p>Explore our latest thoughts and tutorials.</p>
+        </header>
+
+        <div class="archive-layout">
+            <aside class="sidebar">
+                <div class="search-box">
+                    <input type="text" id="blog-search" placeholder="Search posts..." />
+                </div>
+
+                <div class="tags-widget">
+                    <h3>Categories</h3>
+                    <ul class="tag-list">
+                        <li><a href="/blog" class={!currentTag ? "active" : ""}>All Posts</a></li>
+                        {
+                            tags.map((tag) => (
+                                <li>
+                                    <a href={`/blog?tag=${tag}`} class={currentTag === tag ? "active" : ""}>
+                                        {tag}
+                                    </a>
+                                </li>
+                            ))
+                        }
+                    </ul>
+                </div>
+            </aside>
+
+            <main class="posts-list">
+                {
+                    filteredPosts.length > 0 ? (
+                        <div class="posts-grid">
+                            {filteredPosts.map((post) => (
+                                <BlogCard post={post} />
+                            ))}
+                        </div>
+                    ) : (
+                        <div class="no-results">
+                            <p>
+                                No posts found for <strong>{currentTag}</strong>.
+                            </p>
+                            <a href="/blog" class="btn btn-outline">
+                                Show all posts
+                            </a>
+                        </div>
+                    )
+                }
+            </main>
+        </div>
+    </div>
+</BaseLayout>
+
+<style>
+    .blog-archive {
+        padding: 4rem 1.5rem;
+    }
+    .archive-header {
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+    h1 {
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+    }
+    p {
+        opacity: 0.7;
+        font-size: 1.1rem;
+    }
+
+    .archive-layout {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        gap: 3rem;
+    }
+
+    .sidebar {
+        position: sticky;
+        top: 100px;
+        height: fit-content;
+    }
+
+    .search-box {
+        margin-bottom: 2rem;
+    }
+    .search-box input {
+        width: 100%;
+        padding: 0.8rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: var(--card-bg);
+        color: var(--text-color);
+    }
+
+    .tags-widget h3 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+    .tag-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .tag-list a {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        display: block;
+        transition: all 0.2s;
+    }
+    .tag-list a:hover,
+    .tag-list a.active {
+        background-color: var(--color-primary);
+        color: white;
+    }
+
+    .posts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--card-bg);
+        border-radius: 12px;
+    }
+
+    @media (max-width: 900px) {
+        .archive-layout {
+            grid-template-columns: 1fr;
+        }
+        .sidebar {
+            position: static;
+        }
+    }
+</style>
+
+<script>
+    // Simple client-side search
+    const searchInput = document.getElementById("blog-search") as HTMLInputElement;
+    const cards = document.querySelectorAll(".blog-card");
+
+    searchInput?.addEventListener("input", (e) => {
+        const query = (e.target as HTMLInputElement).value.toLowerCase();
+
+        cards.forEach((card) => {
+            const title = (card.querySelector(".card-title") as HTMLElement).innerText.toLowerCase();
+            const desc = (card.querySelector(".card-description") as HTMLElement).innerText.toLowerCase();
+
+            if (title.includes(query) || desc.includes(query)) {
+                (card as HTMLElement).style.display = "block";
+            } else {
+                (card as HTMLElement).style.display = "none";
+            }
+        });
+    });
+</script>

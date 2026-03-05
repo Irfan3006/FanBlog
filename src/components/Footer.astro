@@ -1,0 +1,42 @@
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span class="logo-fan">Fan</span>Blog
+            </div>
+            <p>&copy; {new Date().getFullYear()} FanBlog. Built with Astro SSR.</p>
+        </div>
+    </div>
+</footer>
+
+<style>
+    .footer {
+        padding: 4rem 0 2rem;
+        margin-top: 4rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .footer-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        color: var(--color-gray-100);
+        opacity: 0.8;
+    }
+
+    .footer-logo {
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: var(--text-color);
+    }
+
+    .logo-fan {
+        color: var(--color-primary);
+    }
+
+    p {
+        font-size: 0.9rem;
+        color: var(--text-color);
+    }
+</style>

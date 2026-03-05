@@ -1,0 +1,67 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getAllPosts } from "../../../lib/posts";
+import BlogCard from "../../../components/BlogCard.astro";
+
+const { category } = Astro.params;
+const allPosts = await getAllPosts();
+// Filter by the explicit category property
+const filteredPosts = allPosts.filter((post) => post.category?.toLowerCase() === category?.toLowerCase());
+---
+
+<BaseLayout title={`Category: ${category}`} description={`Explore all articles in the ${category} category on FanBlog.`}>
+    <div class="container archive-page">
+        <header class="header">
+            <span class="eyebrow">Category</span>
+            <h1>{category}</h1>
+            <p>{filteredPosts.length} {filteredPosts.length === 1 ? "article" : "articles"} found in this category</p>
+        </header>
+
+        <div class="posts-grid">
+            {filteredPosts.map((post) => <BlogCard post={post} />)}
+        </div>
+
+        {
+            filteredPosts.length === 0 && (
+                <div class="no-posts">
+                    <p>No posts found for this category.</p>
+                    <a href="/blog" class="btn btn-primary">
+                        Back to Blog
+                    </a>
+                </div>
+            )
+        }
+    </div>
+</BaseLayout>
+
+<style>
+    .archive-page {
+        padding: 4rem 1.5rem;
+    }
+    .header {
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+    .eyebrow {
+        color: var(--color-primary);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+    }
+    h1 {
+        font-size: 3.5rem;
+        margin-top: 0.5rem;
+        text-transform: capitalize;
+    }
+    .posts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+    .no-posts {
+        text-align: center;
+        padding: 4rem;
+        background: var(--card-bg);
+        border-radius: 12px;
+    }
+</style>

@@ -1,0 +1,104 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const isAdmin = Astro.cookies.get("admin_session")?.value === "true";
+if (isAdmin) {
+    return Astro.redirect("/admin");
+}
+---
+
+<BaseLayout title="Admin Login">
+    <div class="login-container container">
+        <div class="login-card">
+            <h1>Admin Login</h1>
+            <p>Please enter your password to access the dashboard.</p>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required />
+                </div>
+                <button type="submit" class="btn btn-primary w-full">Login</button>
+            </form>
+            <div id="error-msg" class="error-msg"></div>
+        </div>
+    </div>
+</BaseLayout>
+
+<style>
+    .login-container {
+        height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .login-card {
+        background: var(--card-bg);
+        padding: 3rem;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+    }
+
+    h1 {
+        margin-bottom: 1rem;
+    }
+    p {
+        margin-bottom: 2rem;
+        opacity: 0.7;
+    }
+
+    .form-group {
+        text-align: left;
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+    .form-group input {
+        width: 100%;
+        padding: 0.8rem;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        background: var(--bg-color);
+        color: var(--text-color);
+    }
+
+    .w-full {
+        width: 100%;
+    }
+
+    .error-msg {
+        color: #ff4d4d;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        min-height: 1.2rem;
+    }
+</style>
+
+<script>
+    const form = document.getElementById("login-form");
+    const errorMsg = document.getElementById("error-msg");
+
+    form?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const password = (document.getElementById("password") as HTMLInputElement).value;
+
+        const res = await fetch("/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ password }),
+        });
+
+        if (res.ok) {
+            window.location.href = "/admin";
+        } else {
+            errorMsg!.innerText = "Invalid password";
+        }
+    });
+</script>

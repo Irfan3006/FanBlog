@@ -1,0 +1,65 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getAllPosts } from "../../../lib/posts";
+import BlogCard from "../../../components/BlogCard.astro";
+
+const { tag } = Astro.params;
+const allPosts = await getAllPosts();
+const filteredPosts = allPosts.filter((post) => post.tags.some((t) => t.toLowerCase() === tag?.toLowerCase()));
+---
+
+<BaseLayout title={`Posts tagged with #${tag}`} description={`Explore all articles tagged with ${tag} on FanBlog.`}>
+    <div class="container archive-page">
+        <header class="header">
+            <span class="eyebrow">Hashtag</span>
+            <h1>#{tag}</h1>
+            <p>{filteredPosts.length} {filteredPosts.length === 1 ? "article" : "articles"} found</p>
+        </header>
+
+        <div class="posts-grid">
+            {filteredPosts.map((post) => <BlogCard post={post} />)}
+        </div>
+
+        {
+            filteredPosts.length === 0 && (
+                <div class="no-posts">
+                    <p>No posts found for this tag.</p>
+                    <a href="/blog" class="btn btn-primary">
+                        Back to Blog
+                    </a>
+                </div>
+            )
+        }
+    </div>
+</BaseLayout>
+
+<style>
+    .archive-page {
+        padding: 4rem 1.5rem;
+    }
+    .header {
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+    .eyebrow {
+        color: var(--color-primary);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+    }
+    h1 {
+        font-size: 3.5rem;
+        margin-top: 0.5rem;
+    }
+    .posts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+    .no-posts {
+        text-align: center;
+        padding: 4rem;
+        background: var(--card-bg);
+        border-radius: 12px;
+    }
+</style>
