@@ -4,41 +4,105 @@ import ThemeToggle from "./ThemeToggle.astro";
 
 <header class="navbar">
     <div class="container nav-content">
-        <a href="/" class="logo">
+        <a href="/" class="logo" aria-label="FanBlog Home">
             <span class="logo-fan">Fan</span><span class="logo-blog">Blog</span>
         </a>
-        <nav>
+        <nav class="desktop-nav">
             <ul class="nav-links">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/blog" class="nav-link">Blog</a></li>
+                <li><a href="/admin" class="admin-link">Admin</a></li>
+                <li class="theme-toggle-li"><ThemeToggle /></li>
+            </ul>
+        </nav>
+
+        <div class="mobile-actions">
+            <ThemeToggle />
+            <button class="mobile-menu-toggle" aria-label="Toggle Menu" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon">
+                    <line x1="3" y1="12" x2="21" y2="12" class="line-middle"></line>
+                    <line x1="3" y1="6" x2="21" y2="6" class="line-top"></line>
+                    <line x1="3" y1="18" x2="21" y2="18" class="line-bottom"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" aria-hidden="true">
+        <nav class="mobile-nav">
+            <ul class="mobile-nav-links">
                 <li><a href="/">Home</a></li>
                 <li><a href="/blog">Blog</a></li>
-                <li><a href="/admin" class="admin-link">Admin</a></li>
-                <li><ThemeToggle /></li>
+                <li><a href="/admin">Admin Panel</a></li>
             </ul>
         </nav>
     </div>
 </header>
 
+<script>
+    const setupMenu = () => {
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        const overlay = document.querySelector('.mobile-menu-overlay');
+        const body = document.body;
+
+        if (!toggle || !overlay) return;
+
+        const handleToggle = () => {
+            const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+            toggle.setAttribute('aria-expanded', !isExpanded ? 'true' : 'false');
+            overlay.setAttribute('aria-hidden', !isExpanded ? 'false' : 'true');
+            overlay.classList.toggle('active');
+            body.style.overflow = !isExpanded ? 'hidden' : '';
+        };
+
+        toggle.addEventListener('click', handleToggle);
+
+        // Close menu when clicking a link
+        overlay.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                toggle.setAttribute('aria-expanded', 'false');
+                overlay.setAttribute('aria-hidden', 'true');
+                overlay.classList.remove('active');
+                body.style.overflow = '';
+            });
+        });
+    };
+
+    setupMenu();
+    document.addEventListener('astro:after-swap', setupMenu);
+</script>
+
 <style>
     .navbar {
         position: sticky;
         top: 0;
-        z-index: 100;
+        z-index: 1000;
         background-color: var(--nav-bg);
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         border-bottom: 1px solid var(--border-color);
-        padding: 1rem 0;
+        padding: 0.75rem 0;
+        transition: var(--transition);
+        height: 64px;
+        display: flex;
+        align-items: center;
     }
 
     .nav-content {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        width: 100%;
     }
 
     .logo {
         font-size: 1.5rem;
         font-weight: 800;
-        letter-spacing: -0.5px;
+        letter-spacing: -0.05em;
+        display: flex;
+        align-items: center;
+        z-index: 1001;
     }
 
     .logo-fan {
@@ -52,24 +116,26 @@ import ThemeToggle from "./ThemeToggle.astro";
         display: flex;
         align-items: center;
         list-style: none;
-        gap: 2rem;
+        gap: 2.5rem;
     }
 
-    .nav-links a {
+    .nav-link {
         font-weight: 500;
-        transition: color 0.2s;
+        font-size: 0.95rem;
+        color: var(--text-muted);
     }
 
-    .nav-links a:hover {
+    .nav-link:hover {
         color: var(--color-primary);
     }
 
     .admin-link {
         background-color: var(--color-black);
         color: var(--color-white) !important;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
+        padding: 0.5rem 1.25rem;
+        border-radius: var(--radius-md);
         font-size: 0.9rem;
+        font-weight: 600;
     }
 
     :global([data-theme="dark"]) .admin-link {
@@ -77,9 +143,46 @@ import ThemeToggle from "./ThemeToggle.astro";
         color: var(--color-black) !important;
     }
 
-    @media (max-width: 600px) {
-        .nav-links {
-            gap: 1rem;
-        }
+    .theme-toggle-li {
+        display: flex;
+        align-items: center;
     }
-</style>
+
+    .mobile-actions {
+        display: none;
+        align-items: center;
+        gap: 0.5rem;
+        z-index: 1001;
+    }
+
+    .mobile-menu-toggle {
+        background: none;
+        border: none;
+        color: var(--text-color);
+        cursor: pointer;
+        padding: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .mobile-menu-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--bg-color);
+        z-index: 998;
+        display: none;
+        padding: 8rem 2rem 2rem;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .mobile-menu-overlay.active {
+        display: block;
+    }
+
+    .mobile-nav-links {
+        list-style: none;
+        display: flex;

@@ -8,64 +8,342 @@ const posts = await getAllPosts();
 
 <BaseLayout
     title="Home"
-    description="FanBlog is a modern blog platform built with Astro SSR. Read our latest thoughts on web development, technology, and more."
+    description="FanBlog is a modern, fast, and minimal blog platform built with Astro SSR. Explore our latest thoughts on technology and web development."
 >
-    <section class="hero container">
-        <h1>Welcome to <span class="text-orange">FanBlog</span></h1>
-        <p class="subtitle">A modern, fast, and minimal blog built with Astro SSR.</p>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container hero-container">
+            <div class="hero-content fade-in">
+                <span class="hero-label">Welcome to the future of blogging</span>
+                <h1 class="hero-title">Discover <span class="text-gradient">FanBlog</span></h1>
+                <p class="hero-subtitle">
+                    A refined, lightning-fast minimalist blog built with Astro SSR, delivering high-performance content, optimized SEO, fast loading speed, and a clean user experience without distractions.
+                </p>
+                <div class="hero-actions">
+                    <a href="/blog" class="btn btn-primary">Start Reading</a>
+                    <a href="#latest-articles" class="btn btn-outline">Learn More</a>
+                </div>
+            </div>
+            <div class="hero-visual fade-in">
+                <div class="glass-card">
+                    <div class="glass-dots">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <div class="glass-content">
+                        <div class="skeleton-line long"></div>
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
-    <section class="container blog-list">
-        <h2>Latest Articles</h2>
-        <div class="posts-grid">
-            {posts.length > 0 ? posts.map((post) => <BlogCard post={post} />) : <p>No posts found. Start by creating one in the admin panel!</p>}
+    <!-- Blog Section -->
+    <section id="latest-articles" class="blog-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Latest Articles</h2>
+                <div class="section-divider"></div>
+            </div>
+
+            <div class="posts-grid">
+                {
+                    posts.length > 0 ? (
+                        posts.map((post) => <BlogCard post={post} />)
+                    ) : (
+                        <div class="empty-state">
+                            <p>No posts found. Start by creating one in the admin panel!</p>
+                            <a href="/admin" class="btn btn-primary mt-4">
+                                Go to Admin
+                            </a>
+                        </div>
+                    )
+                }
+            </div>
         </div>
     </section>
 </BaseLayout>
 
-<style>
-    .hero {
-        padding: 4rem 1.5rem;
-        text-align: center;
+<script>
+    const setupTilt = () => {
+        const card = document.querySelector('.glass-card') as HTMLElement;
+        const container = document.querySelector('.hero-visual') as HTMLElement;
+        
+        if (!card || !container) return;
+
+        let isHovering = false;
+        let mouseX = 0;
+        let mouseY = 0;
+
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!isHovering) return;
+            
+            const rect = container.getBoundingClientRect();
+            // Calculate mouse position relative to card center
+            mouseX = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+            mouseY = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+            
+            // Limit the values
+            mouseX = Math.max(-1, Math.min(1, mouseX));
+            mouseY = Math.max(-1, Math.min(1, mouseY));
+        };
+
+        const updateTilt = () => {
+            if (isHovering) {
+                // Remove float animation while interacting
+                card.style.animation = 'none';
+                
+                // Calculate rotation (max 15 degrees)
+                const rotateX = -mouseY * 15;
+                const rotateY = mouseX * 15;
+                
+                card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            } else {
+                // Restore float animation
+                card.style.animation = 'float 6s ease-in-out infinite';
+            }
+            
+            requestAnimationFrame(updateTilt);
+        };
+
+        container.addEventListener('mouseenter', () => {
+            isHovering = true;
+        });
+
+        container.addEventListener('mousemove', handleMouseMove);
+
+        container.addEventListener('mouseleave', () => {
+            isHovering = false;
+            card.style.transform = 'rotateX(0deg) rotateY(0deg)';
+        });
+
+        // Start animation loop
+        requestAnimationFrame(updateTilt);
     }
 
-    h1 {
-        font-size: 3.5rem;
-        font-weight: 800;
-        letter-spacing: -1px;
+    // Run on load and after view transitions
+    setupTilt();
+    document.addEventListener('astro:after-swap', setupTilt);
+</script>
+
+<style>
+    /* Hero Styles */
+    .hero {
+        padding: 8rem 0 6rem;
+        background: radial-gradient(circle at 90% 10%, var(--color-primary-soft) 0%, transparent 40%);
+    }
+
+    .hero-container {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 4rem;
+        align-items: center;
+    }
+
+    .hero-label {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background-color: var(--color-primary-soft);
+        color: var(--color-primary);
+        font-size: 0.85rem;
+        font-weight: 700;
+        border-radius: 2rem;
+        margin-bottom: 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .hero-title {
+        font-size: 4.5rem;
+        font-weight: 900;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+    }
+
+    .text-gradient {
+        background: linear-gradient(135deg, var(--color-primary) 0%, #ff9d00 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+        font-size: 1.25rem;
+        color: var(--text-muted);
+        max-width: 540px;
+        margin-bottom: 2.5rem;
+        line-height: 1.6;
+    }
+
+    .hero-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    /* Hero Visual */
+    .hero-visual {
+        display: flex;
+        justify-content: flex-end;
+        perspective: 1200px; /* Essential for 3D depth */
+    }
+
+    .glass-card {
+        width: 100%;
+        max-width: 380px;
+        height: 240px;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: var(--radius-xl);
+        padding: 2rem;
+        box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.2);
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.1s ease-out;
+        animation: float 6s ease-in-out infinite;
+        will-change: transform;
+    }
+
+    /* Dynamic Glint Effect */
+    .glass-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.1) 45%,
+            rgba(255, 255, 255, 0.2) 50%,
+            rgba(255, 255, 255, 0.1) 55%,
+            rgba(255, 255, 255, 0) 100%
+        );
+        z-index: 2;
+        border-radius: inherit;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .glass-card:hover::before {
+        opacity: 1;
+    }
+
+    .glass-dots {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        transform: translateZ(20px); /* Lift elements off the card */
+    }
+
+    .glass-dots span {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: var(--border-color);
+    }
+
+    .glass-content {
+        transform: translateZ(40px); /* Create more depth for content */
+    }
+
+    .skeleton-line {
+        height: 12px;
+        background-color: var(--border-color);
+        border-radius: 6px;
         margin-bottom: 1rem;
     }
 
-    .text-orange {
-        color: var(--color-primary);
+    .skeleton-line.long {
+        width: 100%;
+    }
+    .skeleton-line.short {
+        width: 60%;
     }
 
-    .subtitle {
-        font-size: 1.25rem;
-        color: var(--text-color);
-        max-width: 600px;
-        margin: 0 auto;
-        opacity: 0.8;
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotateX(0deg) rotateY(0deg); }
+        33% { transform: translateY(-15px) rotateX(2deg) rotateY(-2deg); }
+        66% { transform: translateY(5px) rotateX(-1deg) rotateY(1deg); }
     }
 
-    .blog-list {
-        padding-bottom: 4rem;
+    /* Blog Section Styles */
+    .blog-section {
+        background-color: var(--bg-color);
     }
 
-    h2 {
-        margin-bottom: 2rem;
-        font-size: 2rem;
+    .section-header {
+        margin-bottom: 3rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .section-title {
+        font-size: 2.25rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .section-divider {
+        width: 60px;
+        height: 4px;
+        background-color: var(--color-primary);
+        border-radius: 2px;
     }
 
     .posts-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 2rem;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 2.5rem;
     }
 
-    @media (max-width: 600px) {
-        h1 {
-            font-size: 2.5rem;
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 4rem;
+        background-color: var(--color-gray-100);
+        border-radius: var(--radius-lg);
+        color: var(--text-muted);
+    }
+
+    :global([data-theme="dark"]) .empty-state {
+        background-color: var(--color-gray-900);
+    }
+
+    @media (max-width: 1024px) {
+        .hero-title {
+            font-size: 3.5rem;
+        }
+        .hero-container {
+            gap: 2rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero {
+            padding: 6rem 0 4rem;
+        }
+        .hero-container {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+        .hero-content {
+            order: 1;
+        }
+        .hero-visual {
+            order: 2;
+            justify-content: center;
+            margin-top: 3rem; /* Spacing between buttons and card */
+        }
+        .hero-subtitle {
+            margin: 0 auto 2.5rem;
+        }
+        .hero-actions {
+            justify-content: center;
+        }
+        .hero-title {
+            font-size: 2.75rem;
         }
     }
 </style>

@@ -1,4 +1,4 @@
-<button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+<button class="theme-toggle" aria-label="Toggle theme">
     <svg
         class="sun"
         xmlns="http://www.w3.org/2000/svg"
@@ -68,16 +68,24 @@
 </style>
 
 <script>
-    const toggle = document.getElementById("theme-toggle");
+    const setupToggles = () => {
+        const toggles = document.querySelectorAll(".theme-toggle");
 
-    toggle?.addEventListener("click", () => {
-        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
-        if (isDark) {
-            document.documentElement.removeAttribute("data-theme");
-            localStorage.setItem("theme", "light");
-        } else {
-            document.documentElement.setAttribute("data-theme", "dark");
-            localStorage.setItem("theme", "dark");
-        }
-    });
+        toggles.forEach((toggle) => {
+            toggle.addEventListener("click", () => {
+                const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+                if (isDark) {
+                    document.documentElement.removeAttribute("data-theme");
+                    localStorage.setItem("theme", "light");
+                } else {
+                    document.documentElement.setAttribute("data-theme", "dark");
+                    localStorage.setItem("theme", "dark");
+                }
+            });
+        });
+    };
+
+    setupToggles();
+    // Re-run setup on View Transitions (if enabled in future)
+    document.addEventListener("astro:after-swap", setupToggles);
 </script>

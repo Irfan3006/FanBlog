@@ -12,26 +12,40 @@ const currentTag = searchParams.get("tag");
 const filteredPosts = currentTag ? posts.filter((post) => post.tags.includes(currentTag)) : posts;
 ---
 
-<BaseLayout
-    title="All Posts"
-    description="Browse all articles on FanBlog. Explore categories, search for topics, and stay updated with our latest content."
->
+<BaseLayout title="Blog" description="Explore our articles, tutorials, and insights on the FanBlog.">
     <div class="container blog-archive">
-        <header class="archive-header">
-            <h1>All Articles</h1>
-            <p>Explore our latest thoughts and tutorials.</p>
+        <header class="archive-header fade-in">
+            <h1 class="archive-title">All Articles</h1>
+            <p class="archive-subtitle">Curated insights on modern web development and design.</p>
         </header>
 
-        <div class="archive-layout">
+        <div class="archive-layout fade-in">
             <aside class="sidebar">
-                <div class="search-box">
-                    <input type="text" id="blog-search" placeholder="Search posts..." />
+                <div class="sidebar-section">
+                    <h3 class="sidebar-label">Search</h3>
+                    <div class="search-box">
+                        <input type="text" id="blog-search" placeholder="Type to search..." aria-label="Search articles" />
+                        <svg
+                            class="search-icon"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg
+                        >
+                    </div>
                 </div>
 
-                <div class="tags-widget">
-                    <h3>Categories</h3>
+                <div class="sidebar-section">
+                    <h3 class="sidebar-label">Categories</h3>
                     <ul class="tag-list">
-                        <li><a href="/blog" class={!currentTag ? "active" : ""}>All Posts</a></li>
+                        <li>
+                            <a href="/blog" class={!currentTag ? "active" : ""}> All Posts </a>
+                        </li>
                         {
                             tags.map((tag) => (
                                 <li>
@@ -56,9 +70,9 @@ const filteredPosts = currentTag ? posts.filter((post) => post.tags.includes(cur
                     ) : (
                         <div class="no-results">
                             <p>
-                                No posts found for <strong>{currentTag}</strong>.
+                                No posts found for <span class="highlight">{currentTag}</span>.
                             </p>
-                            <a href="/blog" class="btn btn-outline">
+                            <a href="/blog" class="btn btn-outline mt-4">
                                 Show all posts
                             </a>
                         </div>
@@ -71,25 +85,32 @@ const filteredPosts = currentTag ? posts.filter((post) => post.tags.includes(cur
 
 <style>
     .blog-archive {
-        padding: 4rem 1.5rem;
+        padding: 6rem 1.5rem;
     }
+
     .archive-header {
-        margin-bottom: 3rem;
+        margin-bottom: 5rem;
         text-align: center;
     }
-    h1 {
-        font-size: 3rem;
-        margin-bottom: 0.5rem;
+
+    .archive-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        letter-spacing: -0.05em;
     }
-    p {
-        opacity: 0.7;
-        font-size: 1.1rem;
+
+    .archive-subtitle {
+        color: var(--text-muted);
+        font-size: 1.25rem;
+        max-width: 600px;
+        margin: 0 auto;
     }
 
     .archive-layout {
         display: grid;
-        grid-template-columns: 250px 1fr;
-        gap: 3rem;
+        grid-template-columns: 280px 1fr;
+        gap: 4rem;
     }
 
     .sidebar {
@@ -98,80 +119,152 @@ const filteredPosts = currentTag ? posts.filter((post) => post.tags.includes(cur
         height: fit-content;
     }
 
-    .search-box {
-        margin-bottom: 2rem;
-    }
-    .search-box input {
-        width: 100%;
-        padding: 0.8rem;
-        border-radius: 8px;
-        border: 1px solid var(--border-color);
-        background: var(--card-bg);
-        color: var(--text-color);
+    .sidebar-section {
+        margin-bottom: 3rem;
     }
 
-    .tags-widget h3 {
-        font-size: 1.2rem;
-        margin-bottom: 1rem;
+    .sidebar-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-muted);
+        margin-bottom: 1.25rem;
     }
+
+    .search-box {
+        position: relative;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.75rem;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-color);
+        background: var(--bg-color);
+        color: var(--text-color);
+        font-family: inherit;
+        font-size: 0.95rem;
+        transition: var(--transition);
+    }
+
+    .search-box input:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 4px var(--color-primary-soft);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        pointer-events: none;
+    }
+
     .tag-list {
         list-style: none;
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.25rem;
     }
+
     .tag-list a {
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        display: block;
-        transition: all 0.2s;
+        padding: 0.6rem 1rem;
+        border-radius: var(--radius-md);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: var(--text-muted);
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition: var(--transition);
     }
-    .tag-list a:hover,
+
+    .tag-list a:hover {
+        background-color: var(--color-gray-100);
+        color: var(--text-color);
+    }
+
     .tag-list a.active {
-        background-color: var(--color-primary);
-        color: white;
+        background-color: var(--color-primary-soft);
+        color: var(--color-primary);
+        font-weight: 600;
+    }
+
+    :global([data-theme="dark"]) .tag-list a:hover {
+        background-color: var(--color-gray-800);
+    }
+
+    :global([data-theme="dark"]) .tag-list a.active {
+        background-color: rgba(255, 107, 0, 0.15);
     }
 
     .posts-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 2rem;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 2.5rem;
     }
 
     .no-results {
         text-align: center;
-        padding: 4rem 2rem;
-        background: var(--card-bg);
-        border-radius: 12px;
+        padding: 5rem 2rem;
+        background: var(--color-gray-100);
+        border-radius: var(--radius-xl);
+        color: var(--text-muted);
     }
 
-    @media (max-width: 900px) {
+    .highlight {
+        color: var(--color-primary);
+        font-weight: 700;
+    }
+
+    @media (max-width: 1024px) {
         .archive-layout {
             grid-template-columns: 1fr;
+            gap: 3rem;
         }
         .sidebar {
             position: static;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        .sidebar-section {
+            margin-bottom: 0;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .sidebar {
+            grid-template-columns: 1fr;
         }
     }
 </style>
 
 <script>
-    // Simple client-side search
-    const searchInput = document.getElementById("blog-search") as HTMLInputElement;
-    const cards = document.querySelectorAll(".blog-card");
+    const setupSearch = () => {
+        const searchInput = document.getElementById("blog-search") as HTMLInputElement;
+        const cards = document.querySelectorAll(".blog-card");
 
-    searchInput?.addEventListener("input", (e) => {
-        const query = (e.target as HTMLInputElement).value.toLowerCase();
+        searchInput?.addEventListener("input", (e) => {
+            const query = (e.target as HTMLInputElement).value.toLowerCase();
 
-        cards.forEach((card) => {
-            const title = (card.querySelector(".card-title") as HTMLElement).innerText.toLowerCase();
-            const desc = (card.querySelector(".card-description") as HTMLElement).innerText.toLowerCase();
+            cards.forEach((card) => {
+                const title = (card.querySelector(".card-title") as HTMLElement).innerText.toLowerCase();
+                const desc = (card.querySelector(".card-description") as HTMLElement).innerText.toLowerCase();
 
-            if (title.includes(query) || desc.includes(query)) {
-                (card as HTMLElement).style.display = "block";
-            } else {
-                (card as HTMLElement).style.display = "none";
-            }
+                if (title.includes(query) || desc.includes(query)) {
+                    (card as HTMLElement).style.display = "";
+                    (card as HTMLElement).classList.add("fade-in");
+                } else {
+                    (card as HTMLElement).style.display = "none";
+                }
+            });
         });
-    });
+    };
+
+    setupSearch();
+    document.addEventListener("astro:after-swap", setupSearch);
 </script>

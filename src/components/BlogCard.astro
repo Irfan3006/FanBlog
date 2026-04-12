@@ -8,14 +8,14 @@ interface Props {
 const { post } = Astro.props;
 const formattedDate = new Date(post.date).toLocaleDateString("en-US", {
     year: "numeric",
-    month: "long",
+    month: "short",
     day: "numeric",
 });
 ---
 
 <article class="blog-card">
     <div class="card-image-wrapper">
-        <a href={`/blog/${post.slug}`}>
+        <a href={`/blog/${post.slug}`} aria-label={`Read ${post.title}`}>
             {
                 post.image ? (
                     <img src={post.image} alt={post.title} class="card-image" loading="lazy" />
@@ -29,15 +29,20 @@ const formattedDate = new Date(post.date).toLocaleDateString("en-US", {
     </div>
     <div class="card-content">
         <div class="card-meta">
-            <a href={`/blog/category/${post.category || "General"}`} class="tag">{post.category || "General"}</a>
-            <span class="dot">•</span>
-            <span>{post.readingTime}</span>
+            <span class="category">{post.category || "General"}</span>
+            <span class="dot">&middot;</span>
+            <span class="reading-time">{post.readingTime}</span>
         </div>
-        <a href={`/blog/${post.slug}`}><h3 class="card-title">{post.title}</h3></a>
+        <a href={`/blog/${post.slug}`}>
+            <h3 class="card-title">{post.title}</h3>
+        </a>
         <p class="card-description">{post.description}</p>
         <div class="card-footer">
-            <a href={`/author/${post.author}`} class="author-link">{post.author}</a>
-            <span class="date">{formattedDate}</span>
+            <div class="author-info">
+                <span class="author-label">By</span>
+                <span class="author-name">{post.author}</span>
+            </div>
+            <time datetime={post.date} class="date">{formattedDate}</time>
         </div>
     </div>
 </article>
@@ -45,69 +50,82 @@ const formattedDate = new Date(post.date).toLocaleDateString("en-US", {
 <style>
     .blog-card {
         background-color: var(--card-bg);
-        border-radius: 12px;
+        border-radius: var(--radius-lg);
         overflow: hidden;
-        transition:
-            transform 0.3s ease,
-            box-shadow 0.3s ease;
         border: 1px solid var(--border-color);
+        transition: var(--transition);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
     }
 
     .blog-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transform: translateY(-4px);
+        box-shadow: var(--card-shadow-hover);
         border-color: var(--color-primary);
     }
 
-    .card-image,
-    .card-image-placeholder {
+    .card-image-wrapper {
+        position: relative;
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+    }
+
+    .card-image {
         width: 100%;
-        height: 200px;
+        height: 100%;
         object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .blog-card:hover .card-image {
+        transform: scale(1.05);
     }
 
     .card-image-placeholder {
-        background: linear-gradient(135deg, var(--color-primary), var(--color-black));
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--color-primary-soft), var(--color-primary));
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
+        color: var(--color-white);
         font-size: 3rem;
         font-weight: 800;
     }
 
     .card-content {
         padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
     }
 
     .card-meta {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         font-weight: 600;
-        margin-bottom: 0.5rem;
         text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.75rem;
+        color: var(--text-muted);
     }
 
-    .tag {
+    .category {
         color: var(--color-primary);
-        background-color: rgba(255, 107, 0, 0.1);
-        padding: 2px 8px;
-        border-radius: 4px;
-        transition: background-color 0.2s;
-    }
-
-    .tag:hover {
-        background-color: var(--color-primary);
-        color: white;
     }
 
     .card-title {
         font-size: 1.25rem;
         margin-bottom: 0.75rem;
-        color: var(--text-color);
+        line-height: 1.4;
         transition: color 0.2s;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 
     .card-title:hover {
@@ -116,35 +134,37 @@ const formattedDate = new Date(post.date).toLocaleDateString("en-US", {
 
     .card-description {
         font-size: 0.95rem;
-        color: var(--text-color);
-        opacity: 0.7;
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
         display: -webkit-box;
-        -webkit-line-clamp: 2;
+        -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
         overflow: hidden;
-        margin-bottom: 1rem;
+        flex-grow: 1;
     }
 
     .card-footer {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        font-size: 0.8rem;
-        padding-top: 1rem;
+        padding-top: 1.25rem;
         border-top: 1px solid var(--border-color);
+        font-size: 0.85rem;
     }
 
-    .author-link {
-        font-weight: 700;
+    .author-info {
+        display: flex;
+        gap: 0.25rem;
+        color: var(--text-muted);
+    }
+
+    .author-name {
         color: var(--text-color);
-        transition: color 0.2s;
-    }
-
-    .author-link:hover {
-        color: var(--color-primary);
+        font-weight: 600;
     }
 
     .date {
-        opacity: 0.6;
+        color: var(--text-muted);
     }
 </style>

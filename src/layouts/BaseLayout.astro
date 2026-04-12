@@ -7,24 +7,31 @@ interface Props {
 	title: string;
 	description?: string;
 	ogImage?: string;
+	canonicalURL?: string;
 }
 
-const { title, description = "FanBlog - Modern Blog & CMS without database using Astro SSR", ogImage } = Astro.props;
-const canonicalURL = new URL(Astro.url.pathname, Astro.site || "https://fanblog.com");
-const defaultOgImage = new URL("/api/og?title=" + encodeURIComponent("FanBlog - Modern Blog"), Astro.site || "https://fanblog.com");
-const socialImage = ogImage ? new URL(ogImage, Astro.url) : defaultOgImage;
+const {
+	title,
+	description = "FanBlog - Modern Blog & CMS built with Astro SSR. Fast, minimalist, and SEO optimized.",
+	ogImage,
+	canonicalURL = Astro.url.href,
+} = Astro.props;
+
+const siteName = "FanBlog";
+const fullTitle = `${title} | ${siteName}`;
+const defaultOgImage = new URL("/api/og?title=" + encodeURIComponent(title), Astro.site || "https://fanblog.com").toString();
+const socialImage = ogImage || defaultOgImage;
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 
 		<meta name="google-site-verification" content="29CnmVlPwO8uPHulbQR6KYzol5wqfKfgDzUtH2isZPk" />
-		<!-- Google tag (gtag.js) -->
 		<script async src="https://www.googletagmanager.com/gtag/js?id=G-7BZ139PHRS"></script>
 		<script is:inline>
 			window.dataLayer = window.dataLayer || [];
@@ -32,11 +39,12 @@ const socialImage = ogImage ? new URL(ogImage, Astro.url) : defaultOgImage;
 				dataLayer.push(arguments);
 			}
 			gtag("js", new Date());
-
 			gtag("config", "G-7BZ139PHRS");
 		</script>
 
-		<title>{title} | FanBlog</title>
+		<!-- Primary Meta Tags -->
+		<title>{fullTitle}</title>
+		<meta name="title" content={fullTitle} />
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonicalURL} />
 		<meta name="author" content="Irfan" />
@@ -45,14 +53,15 @@ const socialImage = ogImage ? new URL(ogImage, Astro.url) : defaultOgImage;
 		<!-- Open Graph / Facebook -->
 		<meta property="og:type" content="website" />
 		<meta property="og:url" content={canonicalURL} />
-		<meta property="og:title" content={title} />
+		<meta property="og:title" content={fullTitle} />
 		<meta property="og:description" content={description} />
 		<meta property="og:image" content={socialImage} />
+		<meta property="og:site_name" content={siteName} />
 
 		<!-- Twitter -->
 		<meta property="twitter:card" content="summary_large_image" />
 		<meta property="twitter:url" content={canonicalURL} />
-		<meta property="twitter:title" content={title} />
+		<meta property="twitter:title" content={fullTitle} />
 		<meta property="twitter:description" content={description} />
 		<meta property="twitter:image" content={socialImage} />
 
@@ -82,7 +91,7 @@ const socialImage = ogImage ? new URL(ogImage, Astro.url) : defaultOgImage;
 	</head>
 	<body>
 		<Navbar />
-		<main class="fade-in">
+		<main id="main-content" class="fade-in">
 			<slot />
 		</main>
 		<Footer />

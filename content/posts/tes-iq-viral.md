@@ -4,7 +4,7 @@ date: 2026-04-10T02:32:09.971Z
 author: "Anonymous"
 category: "General"
 description: "test iq viral 2026, jawaban test iq terbaru, teka teki logika viral, jawaban test iq benar, soal logika menjebak, tes kecerdasan viral tiktok, brain teaser 2026"
-tags: #TestIQ2026 #TekaTekiLogika #BrainTeaser #IQTest #ViralIndonesia #AsahOtak #MindBlown #SayaKalahDari
+tags: TestIQ2026, TekaTekiLogika, BrainTeaser, IQTest, ViralIndonesia, AsahOtak, MindBlown, SayaKalahDari
 image: /uploads/1775788490379-ChatGPT-Image-Apr-10,-2026,-09_34_41-AM.png
 ---
 
