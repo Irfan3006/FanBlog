@@ -5,7 +5,7 @@ import vercel from '@astrojs/vercel/serverless';
 export default defineConfig({
   output: 'server',
   adapter: vercel(),
-  site: 'https://fanblog.vercel.app',
+  site: 'https://fan-blog.vercel.app',
   security: {
     checkOrigin: false
   }
