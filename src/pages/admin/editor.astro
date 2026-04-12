@@ -2,6 +2,12 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getPostBySlug } from "../../lib/posts";
 
+// Guard: redirect to login if session invalid
+const session = Astro.cookies.get("admin_session")?.value;
+if (session !== "authenticated_fanBlog_2026") {
+    return Astro.redirect("/admin/login");
+}
+
 const { searchParams } = Astro.url;
 const slug = searchParams.get("slug");
 
