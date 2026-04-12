@@ -1,7 +1,8 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
-const isAdmin = Astro.cookies.get("admin_session")?.value === "true";
+const session = Astro.cookies.get("fanblog_session_final")?.value;
+const isAdmin = session === "authenticated_fanBlog_2026";
 if (isAdmin) {
     return Astro.redirect("/admin");
 }
