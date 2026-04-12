@@ -27,45 +27,64 @@ import ThemeToggle from "./ThemeToggle.astro";
             </button>
         </div>
     </div>
-
-    <!-- Mobile Menu Overlay -->
-    <div class="mobile-menu-overlay" aria-hidden="true">
-        <nav class="mobile-nav">
-            <ul class="mobile-nav-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/blog">Blog</a></li>
-                <li><a href="/admin">Admin Panel</a></li>
-            </ul>
-        </nav>
-    </div>
 </header>
 
+<!-- Mobile Menu Overlay — outside <header> to avoid sticky stacking context -->
+<div class="mobile-menu-overlay" aria-hidden="true">
+    <button class="mobile-menu-close" aria-label="Close Menu">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    </button>
+    <nav class="mobile-nav">
+        <ul class="mobile-nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/admin">Admin Panel</a></li>
+        </ul>
+    </nav>
+</div>
+
 <script>
+    const closeMenu = () => {
+        const toggle = document.querySelector('.mobile-menu-toggle') as HTMLElement;
+        const overlay = document.querySelector('.mobile-menu-overlay') as HTMLElement;
+        if (!toggle || !overlay) return;
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.classList.remove('active');
+        overlay.setAttribute('aria-hidden', 'true');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    };
+
     const setupMenu = () => {
         const toggle = document.querySelector('.mobile-menu-toggle');
         const overlay = document.querySelector('.mobile-menu-overlay');
+        const closeBtn = document.querySelector('.mobile-menu-close');
         const body = document.body;
 
         if (!toggle || !overlay) return;
 
         const handleToggle = () => {
             const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
-            toggle.setAttribute('aria-expanded', !isExpanded ? 'true' : 'false');
-            overlay.setAttribute('aria-hidden', !isExpanded ? 'false' : 'true');
-            overlay.classList.toggle('active');
-            body.style.overflow = !isExpanded ? 'hidden' : '';
+            const nextState = !isExpanded;
+            
+            toggle.setAttribute('aria-expanded', nextState.toString());
+            toggle.classList.toggle('active', nextState);
+            overlay.setAttribute('aria-hidden', (!nextState).toString());
+            overlay.classList.toggle('active', nextState);
+            body.style.overflow = nextState ? 'hidden' : '';
         };
 
         toggle.addEventListener('click', handleToggle);
 
+        // Close via X button
+        closeBtn?.addEventListener('click', closeMenu);
+
         // Close menu when clicking a link
         overlay.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                toggle.setAttribute('aria-expanded', 'false');
-                overlay.setAttribute('aria-hidden', 'true');
-                overlay.classList.remove('active');
-                body.style.overflow = '';
-            });
+            link.addEventListener('click', closeMenu);
         });
     };
 
@@ -152,7 +171,7 @@ import ThemeToggle from "./ThemeToggle.astro";
         display: none;
         align-items: center;
         gap: 0.5rem;
-        z-index: 1001;
+        z-index: 10000;
     }
 
     .mobile-menu-toggle {
@@ -164,25 +183,103 @@ import ThemeToggle from "./ThemeToggle.astro";
         display: flex;
         align-items: center;
         justify-content: center;
+        position: relative;
+    }
+
+    .menu-icon line {
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        transform-origin: center;
+    }
+
+    .mobile-menu-toggle.active .line-top {
+        transform: translateY(6px) rotate(45deg);
+    }
+
+    .mobile-menu-toggle.active .line-middle {
+        opacity: 0;
+    }
+
+    .mobile-menu-toggle.active .line-bottom {
+        transform: translateY(-6px) rotate(-45deg);
     }
 
     .mobile-menu-overlay {
         position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: var(--bg-color);
-        z-index: 998;
+        inset: 0;
+        background-color: rgba(255, 255, 255, 0.95);
+        z-index: 9999;
         display: none;
-        padding: 8rem 2rem 2rem;
-        animation: fadeIn 0.3s ease;
+        padding: 10rem 2rem 2rem;
+        backdrop-filter: blur(40px);
+        -webkit-backdrop-filter: blur(40px);
+        animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    :global([data-theme="dark"]) .mobile-menu-overlay {
+        background-color: rgba(5, 5, 5, 0.95);
     }
 
     .mobile-menu-overlay.active {
         display: block;
     }
 
+    .mobile-menu-close {
+        position: absolute;
+        top: 1.25rem;
+        right: 1.25rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-color);
+        padding: 0.5rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s, color 0.2s;
+        z-index: 10001;
+    }
+
+    .mobile-menu-close:hover {
+        background-color: var(--border-color);
+        color: var(--color-primary);
+    }
+
     .mobile-nav-links {
         list-style: none;
         display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    .mobile-nav-links a {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text-color);
+        letter-spacing: -0.02em;
+    }
+
+    @media (max-width: 768px) {
+        .navbar {
+            padding: 0.5rem 0;
+        }
+        .desktop-nav {
+            display: none;
+        }
+        .mobile-actions {
+            display: flex;
+        }
+    }
+
+    /* Accessibility: Hide overlay from screen readers when not active */
+    .mobile-menu-overlay[aria-hidden="true"] {
+        visibility: hidden;
+        pointer-events: none;
+    }
+    
+    .mobile-menu-overlay[aria-hidden="false"] {
+        visibility: visible;
+        pointer-events: auto;
+    }
+</style>
